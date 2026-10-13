@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+*.log
+/tmp/
+cookies.txt
+*.m4a
+*.mp3
+*.webm

@@ -1,0 +1,11 @@
+{
+  "name": "sigalmedia-client",
+  "version": "1.0.0",
+  "description": "SigalMedia — Müzik Arama ve Çalma İstemcisi",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve . -p 3001",
+    "start": "npx serve . -p 3001"
+  },
+  "dependencies": {}
+}

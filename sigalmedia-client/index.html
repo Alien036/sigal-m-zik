@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SigalMedia — YouTube tabanlı gelişmiş müzik arama ve çalma platformu. Milyonlarca şarkıya anında erişin." />
+  <title>SigalMedia — Müziği Hisset</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <script>
+    window.process = window.process || { env: { NODE_ENV: 'production' } };
+  </script>
+
+  <!-- Firebase v10 (ESM modül) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js",
+        "firebase/analytics": "https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ░░░ ARKA PLAN PARÇACIKLARI ░░░ -->
+<div class="bg-particles" id="bgParticles"></div>
+
+<!-- ░░░ SIDEBAR ░░░ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">S</div>
+    <span class="logo-text">SigalMedia</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-item active" data-page="home">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Ana Sayfa
+    </a>
+    <a href="#" class="nav-item" data-page="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Keşfet
+    </a>
+    <a href="#" class="nav-item" data-page="library">
+      <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      Kütüphane
+    </a>
+    <a href="#" class="nav-item" data-page="favorites">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      Favoriler
+    </a>
+  </nav>
+
+  <!-- Kullanıcı alanı -->
+  <div class="sidebar-user" id="sidebarUser">
+    <div class="user-avatar" id="userAvatar">?</div>
+    <div class="user-info">
+      <span class="user-name" id="userName">Giriş Yapılmadı</span>
+      <button class="btn-auth" id="authBtn">Giriş Yap</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ░░░ ANA İÇERİK ░░░ -->
+<main class="main-content">
+
+  <!-- Üst Bar -->
+  <header class="topbar">
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+
+    <!-- Arama Kutusu -->
+    <div class="search-container">
+      <div class="search-bar" id="searchBar">
+        <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Şarkı, sanatçı veya albüm ara..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div class="search-spinner" id="searchSpinner"></div>
+        <button class="search-clear" id="searchClear">✕</button>
+      </div>
+
+      <!-- Arama Sonuçları Açılır Paneli -->
+      <div class="search-dropdown" id="searchDropdown">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Bölümü -->
+  <section class="hero-section" id="heroSection">
+    <div class="hero-content">
+      <p class="hero-label">🎵 Müzik Keşfet</p>
+      <h1 class="hero-title">Milyonlarca<br/><span class="gradient-text">Şarkı,</span><br/>Tek Yerden.</h1>
+      <p class="hero-subtitle">YouTube'un tüm müzik arşivine anında erişin. Ara, çal, hisset.</p>
+      <button class="btn-primary hero-cta" onclick="document.getElementById('searchInput').focus()">
+        Aramaya Başla
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="hero-visual">
+      <div class="vinyl-record" id="vinylRecord">
+        <div class="vinyl-center"></div>
+        <div class="vinyl-grooves"></div>
+      </div>
+      <div class="sound-waves" id="soundWaves">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Çalan Parça Bilgisi (arama olmadığında büyük kart) -->
+  <section class="now-playing-section" id="nowPlayingSection" style="display:none">
+    <div class="nps-thumbnail-wrap">
+      <img class="nps-thumbnail" id="npsThumbnail" src="" alt="Kapak" />
+      <div class="nps-overlay"></div>
+    </div>
+    <div class="nps-info">
+      <span class="nps-label">Şu An Çalıyor</span>
+      <h2 class="nps-title" id="npsTitle">—</h2>
+      <p class="nps-artist" id="npsArtist">—</p>
+      <div class="nps-actions">
+        <button class="nps-btn" id="npsFavBtn" title="Favorilere ekle">❤</button>
+        <button class="nps-btn" id="npsShareBtn" title="Paylaş">⬆</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hızlı Öneriler -->
+  <section class="quick-section" id="quickSection">
+    <h2 class="section-title">Popüler Aramalar</h2>
+    <div class="chips-row" id="chipsRow">
+      <button class="chip" data-q="Ezhel">Ezhel</button>
+      <button class="chip" data-q="Sagopa Kajmer">Sagopa Kajmer</button>
+      <button class="chip" data-q="Ceza">Ceza</button>
+      <button class="chip" data-q="Müslüm Gürses">Müslüm Gürses</button>
+      <button class="chip" data-q="Lo-fi chill beats">Lo-fi</button>
+      <button class="chip" data-q="Sezen Aksu">Sezen Aksu</button>
+      <button class="chip" data-q="Tarkan">Tarkan</button>
+      <button class="chip" data-q="Kendrick Lamar">Kendrick</button>
+      <button class="chip" data-q="Duman">Duman</button>
+      <button class="chip" data-q="Yüzyüzeyken Konuşuruz">Yüzyüzeyken Konuşuruz</button>
+    </div>
+  </section>
+
+  <!-- Arama Sonuçları Ana Görünümü -->
+  <section class="search-main-section" id="searchMainSection" style="display:none">
+    <div class="section-header">
+      <div>
+        <span class="section-badge">Arama Sonuçları</span>
+        <h2 class="section-title" id="searchQueryTitle">Şarkılar</h2>
+        <p class="section-sub" id="searchQueryCount">0 şarkı bulundu</p>
+      </div>
+      <div class="view-toggles">
+        <button class="view-toggle-btn active" id="viewGridBtn" title="Kart Görünümü">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </button>
+        <button class="view-toggle-btn" id="viewListBtn" title="Liste Görünümü">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="songs-grid" id="songsGrid"></div>
+  </section>
+
+  <!-- Kütüphane / Favoriler Görünümü -->
+  <section class="library-section" id="librarySection" style="display:none">
+    <div class="section-header">
+      <div>
+        <span class="section-badge" id="libraryBadge">Koleksiyon</span>
+        <h2 class="section-title" id="libraryTitle">Favorilerim</h2>
+        <p class="section-sub" id="libraryCount">0 şarkı</p>
+      </div>
+    </div>
+    <div class="songs-grid" id="libraryGrid"></div>
+  </section>
+
+  <!-- Hata Bildirimi -->
+  <div class="toast" id="toast"></div>
+
+</main>
+
+<!-- ░░░ MÜZİK ÇALAR (ALT BAR) ░░░ -->
+<footer class="player-bar" id="playerBar">
+
+  <!-- Parça Bilgisi -->
+  <div class="player-track">
+    <div class="player-thumb-wrap">
+      <img class="player-thumb" id="playerThumb" src="" alt="" />
+      <div class="player-thumb-overlay"></div>
+    </div>
+    <div class="player-meta">
+      <span class="player-title" id="playerTitle">Parça seçilmedi</span>
+      <span class="player-artist" id="playerArtist">—</span>
+    </div>
+    <button class="player-fav" id="playerFavBtn">♡</button>
+  </div>
+
+  <!-- Kontroller -->
+  <div class="player-controls">
+    <button class="ctrl-btn" id="shuffleBtn" title="Karıştır">
+      <svg viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+    </button>
+    <button class="ctrl-btn" id="prevBtn" title="Önceki">
+      <svg viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+    </button>
+    <button class="ctrl-btn play-btn" id="playPauseBtn" title="Oynat/Duraklat">
+      <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    </button>
+    <button class="ctrl-btn" id="nextBtn" title="Sonraki">
+      <svg viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+    </button>
+    <button class="ctrl-btn" id="repeatBtn" title="Tekrarla">
+      <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+    </button>
+
+    <!-- Progress Bar -->
+    <div class="player-progress-wrap">
+      <span class="time-current" id="timeCurrent">0:00</span>
+      <div class="player-progress" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+        <div class="progress-thumb" id="progressThumb"></div>
+      </div>
+      <span class="time-total" id="timeTotal">0:00</span>
+    </div>
+  </div>
+
+  <!-- Ses Kontrolü -->
+  <div class="player-volume">
+    <button class="ctrl-btn" id="muteBtn">
+      <svg id="volIcon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
+    </button>
+    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" />
+
+    <!-- Yükleniyor spinner -->
+    <div class="player-loading" id="playerLoading" style="display:none">
+      <div class="loading-ring"></div>
+      <span>Yükleniyor...</span>
+    </div>
+  </div>
+
+  <!-- Gizli HTML5 Audio -->
+  <audio id="audioPlayer" preload="none"></audio>
+</footer>
+
+<!-- ░░░ AUTH MODAL ░░░ -->
+<div class="modal-backdrop" id="authModal" style="display:none">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-logo">
+      <div class="logo-mark">S</div>
+      <span>SigalMedia</span>
+    </div>
+    <h2 class="modal-title">Hoş Geldin!</h2>
+    <p class="modal-sub">Favori listeni kaydetmek ve daha fazlası için giriş yap.</p>
+
+    <input type="email" id="authEmail" class="modal-input" placeholder="E-posta adresi" />
+    <input type="password" id="authPassword" class="modal-input" placeholder="Şifre" />
+
+    <button class="btn-primary modal-btn" id="loginBtn">Giriş Yap</button>
+    <button class="btn-secondary modal-btn" id="registerBtn">Hesap Oluştur</button>
+    <button class="btn-google modal-btn" id="googleBtn">
+      <svg viewBox="0 0 24 24" width="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google ile Giriş Yap
+    </button>
+
+    <p class="modal-error" id="authError"></p>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Build files
+dist/
+build/
+*/dist/
+
+# Audio files and cache
+public/audio/*
+!public/audio/.gitkeep
+audio-service/public/audio/*
+!audio-service/public/audio/.gitkeep
+*.m4a
+*.mp3
+*.webm
+*.ogg
+*.wav
+temp/
+tmp/
+
+# Logs
+*.log
+npm-debug.log*
+
+# YouTube cookies
+cookies.txt
+*/cookies.txt
+
+# OS metadata
+.DS_Store
+Thumbs.db
